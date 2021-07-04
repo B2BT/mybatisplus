@@ -2,7 +2,7 @@ package com.example.mybatisplus.model.domain;
 
 import java.io.Serializable;
 
-public class user implements Serializable,Cloneable{
+public class User implements Serializable,Cloneable{
     /** 用户id */
 
     private Integer userid ;

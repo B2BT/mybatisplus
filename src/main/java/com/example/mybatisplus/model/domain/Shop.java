@@ -6,7 +6,7 @@ import java.util.Date;
 
 
 //@Table(name="卖家表")
-public class shop implements Serializable,Cloneable{
+public class Shop implements Serializable,Cloneable{
     /** 卖家id */
     private Integer shopid ;
     /** 卖家用户名 */

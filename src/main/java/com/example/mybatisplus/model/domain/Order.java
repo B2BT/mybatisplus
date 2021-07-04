@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 //@Table(name="订单表")
-public class order implements Serializable,Cloneable{
+public class Order implements Serializable,Cloneable{
     /** 订单编号 */
     private Integer ordertable ;
     /** 创建日期 */
