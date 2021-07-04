@@ -8,5 +8,6 @@
         <result column="info" property="info" />
         <result column="price" property="price" />
         <result column="shopid" property="shopid" />
+        <result column="goodspic" property="goodspic" />
     </resultMap>
 </mapper>

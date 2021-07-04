@@ -33,6 +33,9 @@ public class Goods extends Model<Goods> {
     /** 商品所属卖家id */
     @TableField("shopid")
     private Integer shopid ;
+    /** 商品图片链接 */
+    @TableField("goodspic")
+    private String goodspic ;
 
     @Override
     protected Serializable pkVal() {
