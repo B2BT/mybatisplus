@@ -1,41 +1,39 @@
 package com.example.mybatisplus.model.domain;
 
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
+import io.swagger.annotations.ApiModel;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.experimental.Accessors;
+
 import java.io.Serializable;
-import java.util.Date;
 
 
-//@Table(name="卖家表")
-public class Shop implements Serializable,Cloneable{
+@Data
+@EqualsAndHashCode(callSuper = false)
+@Accessors(chain = true)
+@ApiModel(value="卖家对象", description="")
+public class Shop extends Model<Shop> {
+    private static final long serialVersionUID = 1L;
+
     /** 卖家id */
+    @TableId(value = "shopid", type = IdType.AUTO)
     private Integer shopid ;
     /** 卖家用户名 */
+    @TableField("shopusername")
     private String shopusername ;
     /** 卖家密码 */
-    private String createdTime ;
+    @TableField("password")
+    private String password ;
 
-    /** 卖家id */
-    public Integer getShopid(){
+    @Override
+    protected Serializable pkVal() {
         return this.shopid;
     }
-    /** 卖家id */
-    public void setShopid(Integer shopid){
-        this.shopid = shopid;
-    }
-    /** 卖家用户名 */
-    public String getShopusername(){
-        return this.shopusername;
-    }
-    /** 卖家用户名 */
-    public void setShopusername(String shopusername){
-        this.shopusername = shopusername;
-    }
-    /** 卖家密码 */
-    public String getCreatedTime(){
-        return this.createdTime;
-    }
-    /** 卖家密码 */
-    public void setCreatedTime(String createdTime){
-        this.createdTime = createdTime;
-    }
+
+
 }

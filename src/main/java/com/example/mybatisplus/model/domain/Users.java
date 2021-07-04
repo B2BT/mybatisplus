@@ -14,30 +14,31 @@ import java.io.Serializable;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value="卖家对象", description="")
-public class Goods extends Model<Goods> {
+@ApiModel(value="Users对象", description="")
+public class Users extends Model<Users> {
 
     private static final long serialVersionUID = 1L;
-    /** 商品id */
-    @TableId(value = "goodsid", type = IdType.AUTO)
-    private Integer goodsid ;
-    /** 商品名 */
-    @TableField("goodsname")
-    private String goodsname ;
-    /** 商品信息 */
-    @TableField("info")
-    private String info ;
-    /** 商品价格 */
-    @TableField("price")
-    private Double price ;
-    /** 商品所属卖家id */
-    @TableField("shopid")
-    private Integer shopid ;
+    /** 用户id */
+    @TableId(value = "userid", type = IdType.AUTO)
+    private Integer userid ;
+
+    /** 用户名 */
+    @TableField("username")
+    private String username ;
+
+    /** 手机号 */
+    @TableField("phone")
+    private String phone ;
+
+    /** 密码 */
+    @TableField("password")
+    private String password ;
 
     @Override
     protected Serializable pkVal() {
-        return this.goodsid;
+        return this.userid;
     }
+
 
 
 }
