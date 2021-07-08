@@ -17,7 +17,7 @@
 ### 附：
 
 
-#使用教程
+# 使用教程
 - 1.使用db.sql创建数据库和在application.yml配置自己的数据库账户密码；
 - 2.运行src/main/java/com.example.mybatisplus/MybatisplusApplication.java
 - 3.运行supermarketstatic/index.html
