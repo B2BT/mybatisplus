@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        .divcss5 {
+            border: 1px solid #F00;
+            width: 200px;
+            height: 100px
+        }
+    </style>
+    <link rel="icon" type="image/x-icon" href="img/head/favicon.ico" />
+    <link rel="stylesheet" href="css/foot.css"/>
+    <link rel="stylesheet" href="css/head.css"/>
+    <meta http-equiv="Content-type" content="text/html; charset=UTF-8"/>
+    <noscript>抱歉，你的浏览器不支持 JavaScript!</noscript>
+    <script type="text/javascript" src="js/base-v1.js" charset="utf-8"></script>
+    <script type="text/javascript" src="js/jquery-1.2.6.min.js" charset="utf-8"></script>
+    <script type="text/javascript" src="js/common.js" charset="utf-8"></script>
+    <script type="text/javascript" src="js/jquery.cookie.js" charset="utf-8"></script>
+    <script type="text/javascript" src="js/jquery.min.js" charset="utf-8"></script>
+    <script type="text/javascript" src="js/jquery-extend.js"></script>
+    <script type="text/javascript" src="js/lib-v1.js" charset="utf-8"></script>
+    <link href="css/prodList.css" rel="stylesheet" type="text/css">
+    <link href="css/prodInfo.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="js/logout.js"></script>
+    <script type="text/javascript" src="js/productinfo.js"></script>
+    <meta charset="UTF-8">
+    <title>商品分页</title>
+    <script type="text/javascript">
+        var userId = "";
+        var productId = 0;
+        window.onload = function () {
+            let localUrl = decodeURI(window.location.href);
+            //alert(localUrl);
+            productId = localUrl.split("?")[1].split("=")[1];
+            console.log(productId)
+            $.ajax({
+                url: "http://localhost:8585/goods/"+ productId,
+                dataType: "json",
+                type: "get",
+                success: function (data) {
+                    //图片
+                    var af = JSON.stringify(data);
+                    var af = JSON.parse(af);
+                    //console.log(af.data);
+                    let imgUrl = af.data.goodspic;
+                    //console.log(imgUrl);
+                    productId = data.productId;
+                    document.getElementById("prod_img").src = imgUrl;
+                    document.getElementById("prod_name").innerText = af.data.goodsname;
+                    document.getElementById("prod_desc").innerText = af.data.info;
+                    document.getElementById("prod_pric").innerText = af.data.price;
+                    document.getElementById("prod_num").innerText = 998;
+                }
+            });
+	
+			//获取登录信息
+			userId = document.cookie;
+			console.log(userId);
+				
+			$("#addCart").click(function(){
+				productId = localUrl.split("?")[1].split("=")[1];
+				//是否登录
+				if (userId == "") {
+				    window.location.href = "login.html";
+				    return;
+				}
+				
+				//发送异步建立购物车
+				$.ajax({
+				    url: "http://localhost:8585/order/makeorder?" + userId + "&gid=" + productId,
+				    dataType: "json",
+				    type: "GET",
+				    success: function (data) {
+						
+				        if (data.data!= null ) {
+							var af = JSON.stringify(data);
+							var af = JSON.parse(af);
+							console.log(af.data.orderid);
+				            window.location.href = "mycart.html";
+				        } else {
+				            //alert(data.msg);
+				        }
+				    },
+				    error: function () {
+				        alert("请求失败");
+				    }
+				});
+		});
+}
+    </script>
+</head>
+
+<body>
+<div id="common_head">
+    <div class="line1">
+        <div class="content">
+            <ul>
+                <li class="fore1" id="loginbar" clstag="homepage|keycount|home2013|01b">
+                    <span id="head_span">
+                        <a href="login.html">登录</a>&nbsp;&nbsp;|&nbsp;&nbsp;
+                        <a href="regist.html">注册</a>
+                    </span>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="line2">
+        <img id="logo" src="img/head/logo.png" alt="logo"/>
+        <input type="text" value="" accesskey="s" id="key" autocomplete="off"
+               onkeydown="if(event.keyCode===13) search('key');"/>
+        <input type="button" value="搜 索" onclick="search('key')"/>
+        <span id="goto">
+			<a id="goto_order" href="./myorder.html">我的订单</a>
+			<a id="goto_cart" href="./mycart.html">我的购物车</a>
+		</span>
+        <img id="erwm" src="img/head/e2.png" alt="e2" width="76"/>
+    </div>
+    <div class="line3">
+        <div class="content">
+            <ul>
+                <li><a href="./index.html">首页</a></li>
+                <li><a href="./index.html">全部商品</a></li>
+                <li><a href="./index.html">秒杀商品</a></li>
+                <li><a href="javascript:void(0)">电脑平板</a></li>
+                <li><a href="javascript:void(0)">家用电器</a></li>
+                <li><a href="javascript:void(0)">汽车用品</a></li>
+                <li><a href="javascript:void(0)">食品饮料</a></li>
+                <li><a href="javascript:void(0)">图书杂志</a></li>
+                <li><a href="javascript:void(0)">服装服饰</a></li>
+                <li><a href="javascript:void(0)">大英理财</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div id="warp">
+    <div id="left">
+        <div id="left_top">
+            <img src="" id="prod_img" alt="prod_img"/>
+        </div>
+        <div id="left_bottom"></div>
+    </div>
+    <div id="right">
+        <div id="right_top">
+            <span id="prod_name"><br/></span>
+            <br>
+            <p id="prod_desc"><br/></p>
+        </div>
+        <div id="right_middle">
+				<span id="right_middle_span">
+                    supermarket 价：<span class="price_red" id="prod_pric">1111</span>元<br/>
+			            运     费：满 100 免运费<br/>
+			            服     务：由supermarket负责发货，并提供售后服务<br/>
+                    库存：<span id="prod_num">1111</span>件<br/>
+                    <label for="buyNumInp">购买数量：</label>
+	                <a href="javascript:void(0)" id="delNum" onclick="change(-1)">-</a>
+	                <input id="buyNumInp" name="buyNum" type="text" value="1"/>
+		            <a href="javascript:void(0)" id="addNum" onclick="change(1)">+</a>
+                </span>
+        </div>
+        <div id="right_bottom">
+            <input class="add_cart_but" id="addCart" type="button" onclick="javascrpt:void(0);" value="🛒 加入购物车"/>
+        </div>
+    </div>
+</div>
+
+<div id="common_foot">
+    <p>
+        Copyright © 2011-2019 网上商城 版权所有 保留一切权利 粤CM-20201119 | 粤ICP备20201119号-1
+        <br />
+        粤公网安备  20201119号
+    </p>
+</div>
+</body>
+</html>

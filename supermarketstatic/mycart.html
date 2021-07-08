@@ -1,0 +1,333 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <title>我的购物车</title>
+   <link href="css/cart.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="css/foot.css"/>
+    <link rel="stylesheet" href="css/head.css"/>
+    <meta http-equiv="Content-type" content="text/html; charset=UTF-8"/>
+    <noscript>抱歉，你的浏览器不支持 JavaScript!</noscript>
+    <script type="text/javascript" src="js/base-v1.js" charset="utf-8"></script>
+    <script type="text/javascript" src="js/jquery-1.2.6.min.js" charset="utf-8"></script>
+    <script type="text/javascript" src="js/common.js" charset="utf-8"></script>
+    <script type="text/javascript" src="js/jquery.cookie.js" charset="utf-8"></script>
+    <script type="text/javascript" src="js/jquery.min.js" charset="utf-8"></script>
+    <script type="text/javascript" src="js/jquery-extend.js"></script>
+    <script type="text/javascript" src="js/lib-v1.js" charset="utf-8"></script>
+   <link href="css/prodList.css" rel="stylesheet" type="text/css">
+    <link rel="icon" type="image/x-icon" href="img/head/favicon.ico"/> -->
+   <script type="text/javascript" src="js/logout.js"></script>
+    <meta charset="UTF-8">
+   <script type="text/javascript">
+   	    var userId;
+   	    window.onload = function(){
+   		     /**
+   		      * 检查cookie
+   		      */
+   		     $(function () {
+   			    userId = document.cookie;
+   			    //console.log(userId);
+   		    
+   		        if (userId == null) {
+   		           window.location.href = "login.html";
+   		           return; 
+   		        }
+   		     });
+
+
+            /**
+             * 查询购物车
+             * @param userId 用户id
+             */
+            function query(userId) {
+                $.ajax({
+                    url: "http://localhost:8585/order/findorder?" + userId + "&ispay=0",
+                    dataType: "json",
+                    type: "GET",
+                    success: function (data) {
+                        var af = JSON.stringify(data);
+                        var af = JSON.parse(af);
+                        //console.log(af);
+                        if (af.data.length > 0) {
+                            let money = 0;
+                            //console.log(af.data[0])
+                            $.each(af.data, function (index, cart) {
+
+                                //console.log(cart)
+                                let productId = cart.goodsid;
+                                let productName = 1;
+                                let productPrice = "";
+                                let productImage = "";
+                                let prodHtml = "product-info.html?id=" + productId;
+                                //查询商品信息
+                                $.ajax({
+                                    url: "http://localhost:8585/goods/"+ productId,
+                                    dataType: "json",
+                                    type: "get",
+                                    async: false,
+                                    success: function (data) {
+                                        //图片
+                                        var af = JSON.stringify(data);
+                                        var af = JSON.parse(af);
+                                        //console.log(af.data);
+                                        let imgUrl = af.data.goodspic;
+                                        //console.log(imgUrl);
+                                        productId = data.productId;
+                                        productImage = imgUrl;
+                                        productName = af.data.goodsname;
+                                        productPrice = af.data.price;
+                                    }
+                                });
+
+                                let num = 1;
+                                let inputId = cart.orderid;
+                                let itemMoney = productPrice * num;
+                                money = money + itemMoney;
+                                $("#items").append("<tr class='prods'>" +
+                                    "<td style='width:100px;'><input name='prodC' type='checkbox' checked='checked' class='select_items' style='padding: 0;margin: 2px;' onchange='checkChanged(this)' /><a href='"+prodHtml+"+' target='_blank' style='padding:0;margin: 0;'><img src='"+productImage+"' alt='' width='80' height='90' style='padding:0;margin: 0;'/></a></td>" +
+                                    "<td ><input type='hidden' name='productId' value='"+inputId+"'/><a href='"+prodHtml+"' target='_blank' id='prods_name'>"+productName+"</a></td>" +
+                                    "<td id='prods_price' >"+productPrice+"</td>" +
+                                    "<td ><input type='hidden'  id='" + inputId + "' value='" + num + "'/><input class='buyNumInp1' id='" + productId + "' type='number' value='" + num + "' onblur='inputNum(\"" + productId + "\",\"" + userId + "\")'/></td>" +
+                                    "<td >"+itemMoney+"</td>" +
+                                    "<td ><a href='javascript:void(0)' onclick='del(\""+inputId+"\")'>删除</a></td>" +
+                                    "</tr>");
+                            });
+                            document.getElementById("span_2").innerText = money + "￥";
+                        } else {
+                            alert("购物车为空");
+                        }
+                    }
+                });
+            }
+            query(userId);
+   	    }
+   	    
+   	
+        
+   
+    
+   
+        /**
+         * 删除购物车
+         * @param productId 商品id
+         * @param userId 用户id
+         */
+        function del(oid) {
+            if (oid == null || oid == null) {
+                alert("删除参数有误");
+                return;
+            }
+            //if (confirm("您确定删除吗？")) {
+                $.ajax({
+                    url: "http://localhost:8585/order/delete?oid=" + oid,
+                    dataType: "json",
+                    type: "GET",
+                    success: function (data) {
+                        if (data == true) {
+                            window.location.href = "./mycart.html";
+                        } else {
+                            alert("删除失败");
+                        }
+                    },
+                    error: function () {
+                        alert("请求失败");
+                    }
+                });
+           // }
+        }
+   
+   
+
+   
+        /**
+         * 提交一个订单
+         */
+        function submitOrder(oid){
+            if (oid == null || oid == null) {
+                alert("提交参数有误");
+                return;
+            }
+            $.ajax({
+                url: "http://localhost:8585/order/pay?oid="+oid,
+                dataType: "json",
+                type: "GET",
+                success: function (data) {
+                    if (data==true) {
+                        window.location.href = "./myorder.html";
+                    }else{
+                        alert("支付失败");
+                    }
+                },
+                error: function () {
+                    alert("请求失败");
+                }
+            });
+        }
+
+
+        /**
+         * 支付选中项
+         * @param element 标签
+         */
+        function submitSelected(element){
+            for (let i = 0; i < $(".prods").length; i++) {
+                let prod = $(".prods").eq(i);
+                let checked = prod.find("input[name=prodC]").prop("checked");
+                if (checked){
+                    // 如果是勾选状态
+                    let productId = prod.find("input[name=productId]").val();
+                    console.log(productId);
+                    submitOrder(productId);
+                }
+            }
+        }
+   
+        /**
+         * 全选改变
+         * @param element DOM
+         */
+        function changeSelect(element){
+            let selected = element.checked;
+            $(".select_items").prop("checked", selected);
+            checkChanged(null);
+        }
+   
+        /**
+         * 更改勾选后修改页面
+         */
+        function checkChanged(element){
+            let money = 0;
+            for (let i = 0; i < $(".prods").length; i++) {
+                let prod = $(".prods").eq(i);
+                let checked = prod.find("input[name=prodC]").prop("checked");
+                if (checked){
+                    // 如果是勾选状态
+                    let num = parseInt(prod.find(".buyNumInp1").val());
+                    let price = parseFloat(prod.find("#prods_price").text());
+                    money = money + num * price;
+                }
+            }
+            $("#span_2").text(money + "￥");
+            if (money === 0){
+                $("#total #total_2 a").attr("disabled", true);
+                $("#total #total_2 a").css("background-color", "lightgrey");
+                $("#total #total_2 a").hover(
+                    function(){$("#total #total_2 a").css("background-color", "lightgrey");}
+                )
+            }else {
+                $("#total #total_2 a").attr("disabled", false);
+                $("#total #total_2 a").css("background-color", "#D9141E");
+                $("#total #total_2 a").hover(
+                    function(){$("#total #total_2 a").css("background-color", "#DD4343")},
+                    function(){$("#total #total_2 a").css("background-color", "#D9141E")},
+                )
+            }
+        }
+   
+        /**
+         * 删除选中项
+         * @param element 标签
+         */
+        function deleteSelected(element){
+            for (let i = 0; i < $(".prods").length; i++) {
+                let prod = $(".prods").eq(i);
+                let checked = prod.find("input[name=prodC]").prop("checked");
+                if (checked){
+                    // 如果是勾选状态
+                    let productId = prod.find("input[name=productId]").val();
+                    console.log(productId);
+                    del(productId);
+                }
+            }
+        }
+    </script>
+</head>
+
+<body>
+<div id="common_head">
+    <div class="line1">
+        <div class="content">
+            <ul>
+                <li class="fore1" id="loginbar" clstag="homepage|keycount|home2013|01b">
+                    <span id="head_span">
+                        <a href="login.html">登录</a>&nbsp;&nbsp;|&nbsp;&nbsp;
+                        <a href="regist.html">注册</a>
+                    </span>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="line2">
+        <img id="logo" src="img/head/logo.png" alt="logo"/>
+        <input type="text" value="" accesskey="s" id="key" autocomplete="off"
+               onkeydown="if(event.keyCode===13) search('key');"/>
+        <input type="button" value="搜 索" onclick="search('key')"/>
+        <span id="goto">
+			<a  href="./myorder.html">我的订单</a>
+			<a id="goto_cart" href="./mycart.html">我的购物车</a>
+		</span>
+        <img id="erwm" src="img/head/e2.png" alt="e2" width="76"/>
+    </div>
+    <div class="line3">
+        <div class="content">
+            <ul>
+                <li><a href="./index.html">首页</a></li>
+                <li><a href="./index.html">全部商品</a></li>
+                <li><a href="./index.html">秒杀商品</a></li>
+                <li><a href="javascript:void(0)">电脑平板</a></li>
+                <li><a href="javascript:void(0)">家用电器</a></li>
+                <li><a href="javascript:void(0)">汽车用品</a></li>
+                <li><a href="javascript:void(0)">食品饮料</a></li>
+                <li><a href="javascript:void(0)">图书杂志</a></li>
+                <li><a href="javascript:void(0)">服装服饰</a></li>
+                <li><a href="javascript:void(0)">大英理财</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="warp" >
+    <h3 class="title" style="text-align:center;">支付方式</h3>
+    <div id="forminfo" style="text-align:center;">
+        <label for="order_addr" class="lf">收货地址</label>
+        <textarea name="orderReceiverinfo" id="order_addr" cols="45" rows="5"></textarea><br />
+        <label for="pay_method">支付方式：</label>
+        <input name="" type="radio" value="" checked="checked" id="pay_method">&nbsp;在线支付
+    </div>
+</div>
+<div class="warp">
+    <table id="items">
+        <tr>
+            <th style="width: 90px"><input name="all" type="checkbox" checked="checked" onclick="changeSelect(this)" id="checkbox1"/><label
+                    for="checkbox1">全选</label></th>
+            <th>商品</th>
+            <th>单价(元)</th>
+            <th>数量</th>
+            <th>小计(元)</th>
+            <th>操作</th>
+        </tr>
+    </table>
+    <!-- 总计条 -->
+    <div id="total">
+        <div id="total_1">
+            <a id="del_a" href="javascript:void(0)" onclick="deleteSelected(this)">删除选中的商品</a>
+            <span id="span_2"></span>
+            <span id="span_1">总价：</span>
+        </div>
+        <div id="total_2">
+            <a id="goto_order" href="javascript:void(0)" onclick="submitSelected(this);">提交订单</a>
+        </div>
+    </div>
+</div>
+
+ <a href="#common_head" class="toTop"></a>
+
+<div id="common_foot">
+    <p>
+        Copyright © 2011-2021 网上商城 版权所有 保留一切权利 粤CM-20201119 | 粤ICP备20201119号-1
+        <br/>
+        粤公网安备 20201119号
+    </p>
+</div>
+</body>
+</html>

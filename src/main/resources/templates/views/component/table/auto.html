@@ -87,7 +87,7 @@
         var currPageSize = 10
         table.render({
             elem: '#demo',//表格的id值
-            url: '/admin/list',
+            url: '/user/list',
             toolbar: '#toolbar',
             request: {
                 pageName: 'pageNo' //页码的参数名称，默认：page
@@ -107,11 +107,10 @@
             cols: [
                 [
                     {type: "checkbox", width: 100},
-                    {field: 'id', title: 'ID'},
-                    {field: 'loginName',  title: '用户名'},
+                    {field: 'userid', title: 'ID'},
+                    {field: 'username',  title: '用户名'},
                     {field: 'password', title: '密码'},
-                    {field: 'lastLoginTime',  title: '上次登录'},
-                    {field: 'remark',  title: '备注'},
+                    {field: 'phone',  title: '电话号码'},
                     {fixed: 'right', align:'center', toolbar: '#toolbarDemo'}
                 ]
             ],
@@ -147,14 +146,14 @@
                     layer.confirm("确认删除选中数据吗？删除后将无法恢复",{icon: 2,title: '提示'},function () {
                         $.ajax({
                             type: "post",
-                            url: "/admin/deleteByIds",
+                            url: "/user/deleteByIds",
                             data: {"ids": ids},
                             dataType: "json",
                             success: function (res) {
                                 layer.msg("删除成功",{icno: 6,time:1000},function (id) {
                                     //刷新页面
                                     table.reload('demo', {
-                                        url: '/admin/list'
+                                        url: '/user/list'
                                         ,where: {
                                             "pageNo": currPage,
                                             "pageSize": currPageSize
@@ -183,14 +182,14 @@
                     //向服务端发送删除指令
                     $.ajax({
                         type: "delete",
-                        url: "/admin/"+data.id,
+                        url: "/user/"+data.id,
                         dataType: "json",
                         success: function (result) {
                             layer.close(index);
                             layer.msg("删除成功",{icno: 6,time:1000},function (id) {
                                 //刷新页面
                                 table.reload('demo', {
-                                    url: '/admin/list'
+                                    url: '/user/list'
                                     ,where: {
                                         "pageNo": currPage,
                                         "pageSize": currPageSize

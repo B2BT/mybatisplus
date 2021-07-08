@@ -1,5 +1,6 @@
 package com.example.mybatisplus.web.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.mybatisplus.common.JsonResponse;
 import com.example.mybatisplus.model.domain.Users;
@@ -9,8 +10,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.List;
 
+@CrossOrigin
 @Controller
 @RequestMapping("/user")
 public class UserController  {
@@ -23,15 +27,33 @@ public class UserController  {
         return JsonResponse.success(user);
     }
 
+    /**
+     * 描述：用户登录
+     *
+     */
+    @RequestMapping(path = "/login")
+    @ResponseBody
+    public JsonResponse login(String username, String password){
+        System.out.println(username+password);
+        QueryWrapper<Users> wrapper = new QueryWrapper<>();
+        wrapper.eq("username",username);
+        wrapper.eq("password",password);
+        Users user = userService.getOne(wrapper);
+
+        return JsonResponse.success(user);
+    }
+
+
 
     /**
      * 描述：根据Id删除
      *
      */
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    @GetMapping(path = "/delete", params = "id")
     @ResponseBody
-    public JsonResponse deleteById(@PathVariable("id") Long id) throws Exception {
+    public JsonResponse deleteById(Integer id) throws Exception {
         userService.removeById(id);
+        System.out.println(userService.toString());
         return JsonResponse.success(null);
     }
 
@@ -50,7 +72,7 @@ public class UserController  {
 
 
     /**
-     * 描述:创建Admin
+     * 描述:创建user
      *
      */
     @RequestMapping(value = "", method = RequestMethod.POST)
@@ -62,8 +84,8 @@ public class UserController  {
     @RequestMapping("/list")
     @ResponseBody
     public JsonResponse list(Model model,
-                             @RequestParam(required = false,defaultValue = "1") Integer pageNo,
-                             @RequestParam(required = false,defaultValue = "5")Integer pageSize){
+                             @RequestParam(required = false,defaultValue = "0") Integer pageNo,
+                             @RequestParam(required = false,defaultValue = "10")Integer pageSize){
         Page<Users> page = userService.page(new Page<>(pageNo, pageSize));
 
         return JsonResponse.success(page);

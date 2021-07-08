@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin
 @Controller
 @RequestMapping("/goods")
 public class GoodsController {
@@ -50,7 +51,7 @@ public class GoodsController {
 
 
     /**
-     * 描述:创建Admin
+     * 描述:商品分页显示
      *
      */
     @RequestMapping(value = "", method = RequestMethod.POST)
