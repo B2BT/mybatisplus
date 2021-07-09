@@ -1,12 +1,5 @@
-let UUID = uuid();
 
-/**
- * 文档就绪事件
- */
-$(function () {
-    // 刷新验证码
-    refreshValistr($("input[name=valistr]").next("img").get(0))
-});
+
 
 /**
  * 提交表单校验
@@ -16,40 +9,36 @@ $(function () {
 function register(element) {
     let userName = $(element).find("input[name=username]").val();
     let userPassword = $(element).find("input[name=password]").val();
-    let userPassword2 = $(element).find("input[name=password2]").val();
-    let userNickName = $(element).find("input[name=nickname]").val();
     let userEmail = $(element).find("input[name=email]").val();
-    let valistr = $(element).find("input[name=valistr]").val();
     let result = true;
     result = checkNull("username", "用户名不能为空") && result;
     result = checkNull("password", "密码不能为空") && result;
     result = checkNull("password2", "确认密码不能为空") && result;
-    result = checkNull("nickname", "昵称不能为空") && result;
-    result = checkNull("email", "邮箱不能为空") && result;
-    result = checkNull("valistr", "验证码不能为空") && result;
+    result = checkNull("email", "手机号不能为空") && result;
     result = isEqual("password", "两次密码输入不一致") && result;
-    result = isEmail("email", "邮箱格式不正确") && result;
+    console.log(result);
+
     if (result) {
         $.ajax({
-            url: "/user/save",
+            url: "http://localhost:8585/user/register",
             type: "post",
             data: {
-                "userName": userName,
-                "userPassword": userPassword,
-                "userPassword2": userPassword2,
-                "userNickname": userNickName,
-                "userEmail": userEmail,
-                "valistr": valistr,
-                "token": "VALISTR_" + randomKey
+                "username": userName,
+                "password": userPassword,
+                "phone": userEmail,
             },
             dataType: "json",
             success: function (result) {
-                if (result.status === 200) {
+                if (result.status == true) {
                     // 注册成功
+                    var afdata = JSON.stringify(result);
+                    var af = JSON.parse(afdata);
+                    //console.log(af.data.userid);
+                    document.cookie="uid="+af.data.userid;
                     window.location.href = "./regist_success.html";
-                } else if (result.status === 201) {
+                } else if (result.status == false) {
                     // 后端校验出错
-                    $("#alert").text(result.msg);
+                    $("#alert").text(result.message);
                 } else {
                     alert(result.msg);
                 }
@@ -60,40 +49,6 @@ function register(element) {
         });
     }
     return false;
-}
-
-/**
- * 刷新验证码
- * @param element 标签
- */
-function refreshValistr(element) {
-    window.randomKey = UUID + new Date().getTime();
-    $(element).attr("src", "/valistr?token=VALISTR_" + randomKey);
-}
-
-/**
- * 生成随机UUID
- * @returns {string} 生成的UUID
- */
-function uuid() {
-    let s = [];
-    let hexDigits = "0123456789abcdef";
-    for (let i = 0; i < 36; i++) {
-        s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
-    }
-    s[14] = "4";  // bits 12-15 of the time_hi_and_version field to 0010
-    s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1);  // bits 6-7 of the clock_seq_hi_and_reserved to 01
-    s[8] = s[13] = s[18] = s[23] = "-";
-    return s.join("");
-}
-
-/**
- * 设置校验消息提示
- * @param name input的name
- * @param msg 提示的消息
- */
-function setMsg(name, msg) {
-    $("#" + name + "_msg").text(msg);
 }
 
 
@@ -107,17 +62,17 @@ function usernameBlur(element) {
         setMsg("username", "用户名不能为空");
     } else {
         $.ajax({
-            url: "/user/checkUserName",
+            url: "http://localhost:8585/user/checkUser",
             type: "post",
-            data: {"userName": userName},
+            data: {"username": userName},
             dataType: "json",
             success: function (result) {
-                if (result.status === 201) {
+                if (result == false ) {
                     // 用户名重复
-                    $("#username_msg").text(result.msg);
-                } else if (result.status === 200) {
+                    $("#username_msg").text("用户名已存在");
+                } else if (result == true ) {
                     // 用户名可用
-                    $("#username_msg").text(result.msg).css("color", "green");
+                    $("#username_msg").text("用户名可用").css("color", "green");
                 } else {
                     // 其他异常
                     alert(result.msg);
@@ -145,6 +100,14 @@ function checkNull(name, msg){
         setMsg(name, "");
         return  true;
     }
+}
+/**
+ * 设置校验消息提示
+ * @param name input的name
+ * @param msg 提示的消息
+ */
+function setMsg(name, msg) {
+    $("#" + name + "_msg").text(msg);
 }
 
 /**

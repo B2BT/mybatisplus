@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.mybatisplus.common.JsonResponse;
 import com.example.mybatisplus.model.domain.Users;
 import com.example.mybatisplus.service.UserService;
+import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,6 +29,36 @@ public class UserController  {
     }
 
     /**
+     * 描述：用户注册
+     *
+     */
+    @RequestMapping(path = "/register")
+    @ResponseBody
+    public JsonResponse register(String username, String password, String phone){
+        //检查
+        if(!checkUser(username)){
+            return JsonResponse.failure("用户已存在");
+        }
+        Users users = new Users();
+        users.setUsername(username);
+        users.setPassword(password);
+        users.setPhone(phone);
+        boolean b = userService.saveOrUpdate(users);
+        //注册成功
+        if(b){
+            QueryWrapper<Users> wrapper = new QueryWrapper<>();
+            wrapper.eq("username",username);
+            wrapper.eq("password",password);
+            Users user = userService.getOne(wrapper);
+            return JsonResponse.success(user);
+        }else {
+            return JsonResponse.success(null);
+        }
+    }
+
+
+
+    /**
      * 描述：用户登录
      *
      */
@@ -41,6 +72,25 @@ public class UserController  {
         Users user = userService.getOne(wrapper);
 
         return JsonResponse.success(user);
+    }
+
+    /**
+     * 描述：检查用户名是否重复
+     *
+     */
+    @RequestMapping(path = "/checkUser")
+    @ResponseBody
+    public boolean checkUser(String username){
+        QueryWrapper<Users> wrapper = new QueryWrapper<>();
+        //System.out.println(username);
+        wrapper.eq("username",username);
+        Users user = userService.getOne(wrapper);
+        //System.out.println(user);
+        if(user != null){
+            return false;
+        }else {
+            return true;
+        }
     }
 
 

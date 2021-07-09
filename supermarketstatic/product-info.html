@@ -56,7 +56,38 @@
 	
 			//获取登录信息
 			userId = document.cookie;
-			console.log(userId);
+			//console.log(userId);
+            //获取用户名
+            if (userId != null) {
+                console.log("cookie:" + userId);
+                uid = userId.split("=")[1];
+                console.log(uid);
+                let uname = "";
+                $.ajax({
+                    url: "http://localhost:8585/user/"+uid,
+                    type: "get",
+                    dataType: "json",
+                    success: function (result) {
+                        if (result.status == true) {
+                            var afdata = JSON.stringify(result);
+                            var af = JSON.parse(afdata);
+                            //console.log(af);
+                            uname = af.data.username;
+                            $("#head_span").text(" 当前用户："+uname);
+                        } else if (result.status == false) {
+                            // 后端校验出错
+                            $("#alert").text(result.message);
+                        } else {
+                            alert(result.msg);
+                        }
+                    },
+                    error: function () {
+                        //alert("请求失败！");
+                    }
+                });
+            }
+
+
 				
 			$("#addCart").click(function(){
 				productId = localUrl.split("?")[1].split("=")[1];
@@ -65,6 +96,7 @@
 				    window.location.href = "login.html";
 				    return;
 				}
+
 				
 				//发送异步建立购物车
 				$.ajax({
@@ -72,7 +104,6 @@
 				    dataType: "json",
 				    type: "GET",
 				    success: function (data) {
-						
 				        if (data.data!= null ) {
 							var af = JSON.stringify(data);
 							var af = JSON.parse(af);

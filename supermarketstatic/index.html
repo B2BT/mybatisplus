@@ -16,6 +16,7 @@
     <script type="text/javascript" src="js/jquery.min.js" charset="utf-8"></script>
     <script type="text/javascript" src="js/jquery-extend.js"></script>
     <script type="text/javascript" src="js/logout.js"></script>
+    <script type="text/javascript" src="js/cookie.js"></script>
     <script type="text/javascript" src="js/lib-v1.js" charset="utf-8"></script>
     <link href="css/prodList.css" rel="stylesheet" type="text/css">
     <link rel="icon" type="image/x-icon" href="img/head/favicon.ico" />
@@ -32,7 +33,7 @@
                         //获取图片地址
                         var af = JSON.stringify(data);
                         var af = JSON.parse(af);
-                        console.log(af.data);
+                        //console.log(af.data);
                         for(i = 0; i <= 6;i++){
                             var name = "#pic"+i;
                             $(name).attr("src",af.data.records[i].goodspic);
@@ -49,8 +50,42 @@
                 var name = "#a"+j;
                 $(name).attr("href","product-info.html?id="+j);
             }
-			
-			//getName();
+
+            //获取用户名
+            userId = document.cookie;
+            //console.log(userId);
+            if (userId != null) {
+                //console.log("cookie:" + userId);
+                userId = userId.split("=")[1];
+                //console.log(userId);
+                let uname = "";
+                $.ajax({
+                    url: "http://localhost:8585/user/"+userId,
+                    type: "get",
+                    dataType: "json",
+                    success: function (result) {
+                        if (result.status == true) {
+                            // 注册成功
+                            var afdata = JSON.stringify(result);
+                            var af = JSON.parse(afdata);
+                            //console.log(af);
+                            uname = af.data.username;
+
+                            $("#head_span").text(" 当前用户："+uname);
+
+                        } else if (result.status == false) {
+                            // 后端校验出错
+                            $("#alert").text(result.message);
+                        } else {
+                            alert(result.msg);
+                        }
+                    },
+                    error: function () {
+                        //alert("请求失败！");
+                    }
+                });
+
+            }
         }
 
 

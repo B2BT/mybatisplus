@@ -15,7 +15,7 @@
     <script type="text/javascript" src="js/jquery-extend.js"></script>
     <script type="text/javascript" src="js/lib-v1.js" charset="utf-8"></script>
    <link href="css/prodList.css" rel="stylesheet" type="text/css">
-    <link rel="icon" type="image/x-icon" href="img/head/favicon.ico"/> -->
+    <link rel="icon" type="image/x-icon" href="img/head/favicon.ico"/>
    <script type="text/javascript" src="js/logout.js"></script>
     <meta charset="UTF-8">
    <script type="text/javascript">
@@ -31,7 +31,35 @@
    		        if (userId == null) {
    		           window.location.href = "login.html";
    		           return; 
-   		        }
+   		        }else {
+                    console.log("cookie:" + userId);
+                    uid = userId.split("=")[1];
+                    console.log(uid);
+                    let uname = "";
+                    $.ajax({
+                        url: "http://localhost:8585/user/"+uid,
+                        type: "get",
+                        dataType: "json",
+                        success: function (result) {
+                            if (result.status == true) {
+                                // 注册成功
+                                var afdata = JSON.stringify(result);
+                                var af = JSON.parse(afdata);
+                                //console.log(af);
+                                uname = af.data.username;
+                                $("#head_span").text(" 当前用户："+uname);
+                            } else if (result.status == false) {
+                                // 后端校验出错
+                                $("#alert").text(result.message);
+                            } else {
+                                alert(result.msg);
+                            }
+                        },
+                        error: function () {
+                            //alert("请求失败！");
+                        }
+                    });
+                }
    		     });
 
 
