@@ -19,18 +19,16 @@
    <script type="text/javascript" src="js/logout.js"></script>
     <meta charset="UTF-8">
    <script type="text/javascript">
-   	    var userId;
+   	    //var userId;
    	    window.onload = function(){
    		     /**
    		      * 检查cookie
    		      */
-   		     $(function () {
    			    userId = document.cookie;
-   			    //console.log(userId);
+   			    //console.log("heeelo:"+userId);
    		    
-   		        if (userId == null) {
-   		           window.location.href = "login.html";
-   		           return; 
+   		        if (userId == "") {
+                    window.location.href = "login.html";
    		        }else {
                     console.log("cookie:" + userId);
                     uid = userId.split("=")[1];
@@ -60,7 +58,6 @@
                         }
                     });
                 }
-   		     });
 
 
             /**
